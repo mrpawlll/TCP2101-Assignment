@@ -1,9 +1,10 @@
-#include <vector>
 #include <algorithm>
+#include <regex>
+
+#include "entities.h"
+
 
 /*
-
-
 Let's go over the code step by step:
 
 1. We define a struct `Edge` to represent an edge in the graph. It has three fields `u`, `v`, and `weight`,
@@ -32,104 +33,21 @@ It takes two arguments: a vector of edges, and the number of vertices in the gra
 We first create a disjoint set object `dsu` with `n` nodes. Then, we sort the edges in increasing order of weight using a lambda function as the comparator.
 We iterate over each edge in the sorted order, and if its two endpoints are not in the same set, we merge the sets using `dsu.merge` and add the edge to the minimum spanning tree.
 Finally, we return the minimum spanning tree.
-
-
 */
 
-using namespace std;
 
-// Define a structure to represent an edge
-struct Edge
-{
-    int u, v, weight;
-};
-
-struct Vertics
-{
-    int index;
-    string name;
-};
-
-struct Tree
-{
-    vector<Edge> edges;
-    vector<Vertics> vertics;
-};
-
-// Define a structure to represent a disjoint set
-struct DisjointSet
-{
-    vector<int> parent, rank;
-
-    // Constructor to initialize the disjoint set
-    DisjointSet(int n)
-    {
-        parent.resize(n);
-        rank.resize(n);
-        for (int i = 0; i < n; i++)
-        {
-            parent[i] = i;
-            rank[i] = 0;
-        }
-    }
-
-    // Find the parent of a node in the disjoint set
-    int find(int x)
-    {
-        if (parent[x] == x)
-        {
-            return x;
-        }
-        return parent[x] = find(parent[x]);
-    }
-
-    // Merge two sets in the disjoint set
-    void merge(int x, int y)
-    {
-        int rootX = find(x);
-        int rootY = find(y);
-        if (rootX != rootY)
-        {
-            if (rank[rootX] < rank[rootY])
-            {
-                swap(rootX, rootY);
-            }
-            parent[rootY] = rootX;
-            if (rank[rootX] == rank[rootY])
-            {
-                rank[rootX]++;
-            }
-        }
-    }
-};
-
-void tokenize(std::string const &str, const char *delim, vector<int> &out)
-{
-    char *token = strtok(const_cast<char *>(str.c_str()), delim);
-    while (token != nullptr)
-    {
-        if (token == "i"){
-            out.push_back(0);
-        }else{
-            out.push_back((int) std::string(token) );
-        };
-
-        token = strtok(nullptr, delim);
-    }
-}
 
 vector<Edge> adjacencyMatrixToList(const vector<vector<int>> &matrix)
 {
     int n = matrix.size();
-    // vector<vector<int>> adjList(n);
-
     vector<Edge> edges;
 
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < n; j++)
+        vector<int> y = matrix[i];
+        for (int j = 0; j < y.size(); j++)
         {
-            if (matrix[i][j] == 0) continue;
+            if(matrix[i][j] == 0) continue;
             edges.push_back({i, j, matrix[i][j]});
         }
     }
@@ -138,9 +56,9 @@ vector<Edge> adjacencyMatrixToList(const vector<vector<int>> &matrix)
 }
 
 // Function to read input from a file
-vector<Edge> readInput(string filename)
+Graph readInput(string filename)
 {
-    vector<Vertics> vertics;
+    Graph graph;
 
     ifstream fin(filename);
     if (!fin)
@@ -158,7 +76,7 @@ vector<Edge> readInput(string filename)
         int index;
         string name;
         fin >> index >> name;
-        vertics.push_back({i, name});
+        graph.vertics.push_back({i, name});
     }
 
     // load adjecency matrix
@@ -173,10 +91,10 @@ vector<Edge> readInput(string filename)
 
     // convert adjecency matrix to list
 
-    vector<Edge> edges = adjacencyMatrixToList(adjacencyMatrix);
+    graph.edges = adjacencyMatrixToList(adjacencyMatrix);
 
     fin.close();
-    return edges;
+    return graph;
 }
 
 // Function to write output to a file and the screen
@@ -191,18 +109,12 @@ void writeOutput(vector<Edge> MST, string filename)
     int totalWeight = 0;
     for (Edge edge : MST)
     {
-        fout << edge.u << " " << edge.v << " " << edge.weight << endl;
+        fout << getVertixName(edge.u) << " " <<  getVertixName(edge.v) << " " << edge.weight << endl;
         totalWeight += edge.weight;
     }
     fout << "Total weight of MST: " << totalWeight << endl;
     fout.close();
-    // Also write the output to the screen
-    cout << "Minimum spanning tree:" << endl;
-    for (Edge edge : MST)
-    {
-        cout << edge.u << " " << edge.v << " " << edge.weight << endl;
-    }
-    cout << "Total weight of MST: " << totalWeight << endl;
+
 }
 
 // Kruskal's algorithm to find the minimum spanning tree
@@ -224,24 +136,37 @@ vector<Edge> kruskal(vector<Edge> &edges, int n)
     return MST;
 }
 
+int extractNumber(const std::string& text) {
+    std::regex numberRegex("\\d+");
+    std::smatch match;
+
+    if (std::regex_search(text, match, numberRegex)) {
+        return std::stoi(match[0]);
+    }
+
+    // Return a default value (or throw an exception) if no number is found
+    return -1;
+}
+
 int initKruskal()
 {
     // Read input from a file
     const string path = "kruskalwithoutpq";
-    int counter = 10;
     for (auto &entry : fs::directory_iterator(path))
     {
-        vector<Edge> edges = readInput(entry.path().string());
-        int n = edges.size();
+        string pathName = entry.path().string();
+        int counter = extractNumber(pathName);
+
+        Graph graph = readInput(pathName);
+        int n = graph.edges.size();
 
         // Find the minimum spanning tree using Kruskal's algorithm
-        vector<Edge> MST = kruskal(edges, n);
+        vector<Edge> MST = kruskal(graph.edges, n);
         // Write output to a file and the screen
 
         fs::create_directory("kruskalwithoutpq_output");
         string filename = "kruskalwithoutpq_output/kruskalwithoutpq_am_" + std::to_string(counter) + "_output.txt";
         writeOutput(MST, filename);
-        counter = counter * 10;
     }
 
     return 0;

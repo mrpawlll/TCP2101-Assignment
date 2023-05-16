@@ -7,8 +7,10 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
-#include "questions/q2.h"
-#include "questions/q1.h"
+#include "src/utils.h"
+
+#include "src/kruskal_graph_generation.h"
+#include "src/kruskal.h"
 
 
 // Function to display the welcome message

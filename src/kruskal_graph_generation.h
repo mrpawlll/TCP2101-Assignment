@@ -1,25 +1,14 @@
 #include <fstream>
-#include <random>
-#include <chrono>
 
-// Function to generate a random integer between min and max (inclusive)
-int randInt(int min, int max)
-{
-    static mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-    uniform_int_distribution<int> dist(min, max);
-    return dist(rng);
-}
 
 // Function to generate a random adjacency matrix with n vertices and random edge weights
 void generateRandomGraph(int n, ofstream &file)
 {
     file << n << endl;
 
-    string alphapet = "ABCDEFGHIJKLMNOPQRSTUPWXYZ";
-
-    for (int i = 0; i < n && i < 26; i++)
+    for (int i = 0; i < n; i++)
     {
-        file << i << " " << alphapet[i] << endl;
+        file << i << " " << getVertixName(i) << endl;
     }
 
 
@@ -27,6 +16,11 @@ void generateRandomGraph(int n, ofstream &file)
     {
         for (int j = 0; j < n; j++)
         {
+            if(i == j){
+                file << "i" << " ";
+                continue;
+            }
+
             if (randInt(0, 1) == 1){
                 int weight = randInt(1, 9);
                 file << weight << " ";
