@@ -64,3 +64,8 @@ struct DisjointSet
         }
     }
 };
+
+struct LetterFrequency{
+    char letter;
+    int frequency;
+};
