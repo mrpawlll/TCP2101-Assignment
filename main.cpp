@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 
 #include "src/kruskal_graph_generation.h"
 #include "src/kruskal.h"
+#include "src/huffman_graph_generation.h"
 
 
 // Function to display the welcome message
@@ -25,28 +26,35 @@ int menu() {
     cout << "Please choose an option:" << endl;
     cout << "1. Generate Kruskal Input Files" << endl;
     cout << "2. Process Kruskal Files " << endl;
-    cout << "3. Quit" << endl;
+    cout << "3. Process Huffman Input Files " << endl;
+    cout << "4. Quit" << endl;
     cout << "Your choice: ";
     cin >> choice;
     cout << endl;
     return choice;
 }
 
-int main() {
+int main()
+{
     welcome();
     int choice = menu();
     // Perform actions based on user's choice
-    while (choice != 3) {
-        switch (choice) {
-            case 1:
-                initGenerateRandomGraph();
-                break;
-            case 2:
-                initKruskal();
-                break;
-            default:
-                cout << "Invalid choice. Please try again." << endl;
-                break;
+    while (choice != 3)
+    {
+        switch (choice)
+        {
+        case 1:
+            initGenerateRandomGraph();
+            break;
+        case 2:
+            initKruskal();
+            break;
+        case 3:
+            Huffman_GraphGenerator();
+            break;
+        default:
+            cout << "Invalid choice. Please try again." << endl;
+            break;
         }
         choice = menu();
     }
