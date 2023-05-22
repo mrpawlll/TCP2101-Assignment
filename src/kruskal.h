@@ -95,7 +95,7 @@ Graph readInput(string filename)
 }
 
 // Function to write output to a file and the screen
-void writeOutput(vector<Edge> MST, string filename)
+void writeOutput(vector<Edge> MST, string filename, int counter, std::chrono::system_clock::time_point start)
 {
     ofstream fout(filename);
     if (!fout)
@@ -104,12 +104,26 @@ void writeOutput(vector<Edge> MST, string filename)
         exit(1);
     }
     int totalWeight = 0;
+
+    fout << counter << endl;
+
+    for (int i = 0; i < counter; i++)
+    {
+        fout << i << " " << getVertixName(i) << endl;
+    }    
+
     for (Edge edge : MST)
     {
         fout << getVertixName(edge.u) << " " <<  getVertixName(edge.v) << " " << edge.weight << endl;
         totalWeight += edge.weight;
     }
     fout << "Total weight of MST: " << totalWeight << endl;
+
+    auto end = chrono::system_clock::now();
+    chrono::duration<double> duration = end - start;
+
+    fout << "Total Time taken of MST: " << duration.count() << "s" << endl;
+
     fout.close();
 
 }
@@ -151,6 +165,8 @@ int initKruskal()
     const string path = "kruskalwithoutpq";
     for (auto &entry : fs::directory_iterator(path))
     {
+        std::chrono::system_clock::time_point start = chrono::system_clock::now();
+
         string pathName = entry.path().string();
         int counter = extractNumber(pathName);
 
@@ -163,7 +179,7 @@ int initKruskal()
 
         fs::create_directory("kruskalwithoutpq_output");
         string filename = "kruskalwithoutpq_output/kruskalwithoutpq_am_" + std::to_string(counter) + "_output.txt";
-        writeOutput(MST, filename);
+        writeOutput(MST, filename, counter, start);
     }
 
     return 0;
