@@ -8,9 +8,11 @@ using namespace std;
 namespace fs = std::filesystem;
 
 #include "src/utils.h"
+#include "src/entities.h"
 
-#include "src/kruskal_graph_generation.h"
 #include "src/kruskal.h"
+#include "src/kruskal_graph_generation.h"
+
 #include "src/huffman_graph_generation.h"
 
 
@@ -26,7 +28,7 @@ int menu() {
     cout << "Please choose an option:" << endl;
     cout << "1. Generate Kruskal Input Files" << endl;
     cout << "2. Process Kruskal Files " << endl;
-    cout << "3. Process Huffman Input Files " << endl;
+    cout << "3. Generate Huffman Input Files " << endl;
     cout << "4. Quit" << endl;
     cout << "Your choice: ";
     cin >> choice;
@@ -39,7 +41,7 @@ int main()
     welcome();
     int choice = menu();
     // Perform actions based on user's choice
-    while (choice != 3)
+    while (choice != 4)
     {
         switch (choice)
         {
