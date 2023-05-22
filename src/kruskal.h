@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <regex>
 
-
 /*
 Let's go over the code step by step:
 
