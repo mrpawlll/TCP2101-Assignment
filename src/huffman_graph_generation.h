@@ -99,7 +99,7 @@ void storeDataInFile(ofstream &file, const vector<LetterFrequency> &distinctLett
 int Huffman_GraphGenerator()
 {
     // Generate 5 random input files with various sizes
-    for (int n : {3,10, 100}) // 1000, 10000, 100000
+    for (int n : {3,10, 100,1000,10000}) // 1000, 10000, 100000
     {
         fs::create_directory("huffman");
 

@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include <chrono>
 
 using namespace std;
 
@@ -29,10 +30,20 @@ struct Compare {
     bool operator()(Node* left, Node* right) {
         string L = left->word;
         string R = right->word;
+        int leftLength,rightLength;
+        leftLength = L.size();
+        rightLength = R.size();
 
         if(left->frequency == right->frequency){
             if(L.length() == R.length()){
-                return R.compare(left->word);
+                if(L.compare(right->word)>0){
+                    return true;
+                }else if(L.compare(right->word)==0){
+                    return true;
+                }else if(L.compare(right->word)<0){
+                    return false;
+                }
+                return true;
             }else{
                 return L.length() > R.length();
             }
@@ -94,10 +105,8 @@ Node* buildHuffmanTree(const unordered_map<string, int>& frequencies) {
     int initialSize = pq.size();
     while (pq.size() > 1) {
         Node* left = pq.top();
-        // cout<<"Left:"<<left->word<<"("<<left->frequency<<")"<<endl;
         pq.pop();
         Node* right = pq.top();
-        // cout<<"Right:"<<right->word<<"("<<right->frequency<<")"<<endl;
         pq.pop();
 
         string parentName = left->word + right->word;
@@ -106,6 +115,9 @@ Node* buildHuffmanTree(const unordered_map<string, int>& frequencies) {
         parent->left = left;
         parent->right = right;
         pq.push(parent);
+
+        // cout<<"Left:"<<left->word<<"("<<left->frequency<<")"<<endl;
+        // cout<<"Right:"<<right->word<<"("<<right->frequency<<")"<<endl;
         // cout<<endl;
     }
 
@@ -114,6 +126,9 @@ Node* buildHuffmanTree(const unordered_map<string, int>& frequencies) {
 
 // Perform Huffman coding on the input text
 void huffmanEncoding(const string& inputFile, const string& outputFile,bool q5) {
+    chrono::time_point<chrono::system_clock> timerStart, timerEnd;
+    timerStart = chrono::system_clock::now();
+
     ifstream input(inputFile);
     if (!input) {
         cerr << "Error: Unable to open input file." << endl;
@@ -138,10 +153,13 @@ void huffmanEncoding(const string& inputFile, const string& outputFile,bool q5) 
         lineNumber++;
     }
 
+    float totalLetters=0;
+    float encodedTextSize = 0;
     // Process the last line
     for (char ch : lastLine) {
         string word(1, ch);
         frequencies[word]++;
+        totalLetters++;
     }
 
     input.close();
@@ -157,26 +175,34 @@ void huffmanEncoding(const string& inputFile, const string& outputFile,bool q5) 
     input.open(inputFile);
     getline(input, lastLine);
     input.close();
+    timerEnd = chrono::system_clock::now();
+
+    std::chrono::duration<double> totalTime = timerEnd - timerStart;
 
     string encodedText = encodeWords(line, codes);
     //sort the entries in alphabetical order
     vector<pair<string, int>> sortedEntries(frequencies.begin(), frequencies.end());
     sort(sortedEntries.begin(),sortedEntries.end());
 
+    encodedTextSize = encodedText.size();
+    float percentage = (encodedTextSize/(totalLetters*7))*100;
     //terminal output
         if(q5==true){
                 // Output number of unique letters
-            cout << sortedEntries.size()-1 << endl;
+            cout << sortedEntries.size() << endl;
                 // Output letters with their respective frequencies and coded words
             for (const auto& entry : sortedEntries) {
                 const string& letter = entry.first;
                 int frequency = entry.second;
                 const string& code = codes[letter];
-                cout << letter << " " << frequency << " " << code << endl;
+                cout << letter << " " << frequency << " " << code <<" "<<frequency * code.size()<< endl;
             }
-            cout << "Encoded Text: " << encodedText << endl;
-                // Output decoded text
-            cout << "Decoded Text: " << decodeText(encodedText, root) << endl;
+            // cout << "Encoded Text: " << encodedText << endl;
+            // cout << "Decoded Text: " << decodeText(encodedText, root) << endl;
+            cout<<encodedText.size()<<"-bit out of "<<totalLetters*7<<"-bit"<<endl;
+            cout<<"Total space "<< std::fixed << setprecision(0) <<percentage<<"%"<<endl;
+            cout<<setprecision(4)<<totalTime.count()<<"s"<<endl<<endl;
+
         }
 
     //write to file
@@ -186,14 +212,16 @@ void huffmanEncoding(const string& inputFile, const string& outputFile,bool q5) 
         cerr << "Error: Unable to open output file." << endl;
         return;
     }
-    output << sortedEntries.size() - 1 << endl;
+    output << sortedEntries.size() << endl;
         for (const auto& entry : sortedEntries) {
         const string& letter = entry.first;
         int frequency = entry.second;
         const string& code = codes[letter];
-        output << letter << " " << frequency << " " << code << endl;
+        output << letter << " " << frequency << " " << code <<" "<<frequency * code.size()<< endl;
     }
-    output << encodedText;
+    output<<encodedText.size()<<"-bit out of "<<totalLetters*7<<"-bit"<<endl;
+    output<<"Total space "<< std::fixed << setprecision(0) <<percentage<<"%"<<endl;
+    output<<setprecision(4)<<totalTime.count()<<"s";
     output.close();
 
 }
@@ -227,6 +255,11 @@ int huffmanMain() {
             }
         }
     }
+
+    // bool questionFive = true;
+    // string inputFile = "input.txt";
+    // string outputFile = "output.txt";
+    // huffmanEncoding(inputFile, outputFile,questionFive);
 
     return 0;
 }
