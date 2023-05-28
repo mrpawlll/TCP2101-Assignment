@@ -75,27 +75,31 @@ void storeDataInFile(ofstream &file, const vector<LetterFrequency> &distinctLett
 {
 
     // Store number of distinct letters
-    int numDistinctLetters = words.size();
+    int numDistinctLetters = distinctLetters.size();
     file << numDistinctLetters << endl;
 
     // Store distinct letters
     for (const auto &lf : distinctLetters)
     {
-        file << lf.letter << " " << lf.frequency;
+        file << lf.letter;
         file << endl;
     }
 
     // Store generated words
     for (const auto &word : words)
     {
-        file << word << endl;
+        if(word == words.back()){
+            file << word;
+            break;
+        }
+        file << word << " ";
     }
 }
 
 int Huffman_GraphGenerator()
 {
     // Generate 5 random input files with various sizes
-    for (int n : {10, 100}) // 1000, 10000, 100000
+    for (int n : {3,10, 100}) // 1000, 10000, 100000
     {
         fs::create_directory("huffman");
 

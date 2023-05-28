@@ -64,6 +64,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "filesystem": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "memory_resource": "cpp"
     }
 }
